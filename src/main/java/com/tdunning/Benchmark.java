@@ -72,6 +72,13 @@ public class Benchmark {
         } else {
             td = new ArrayDigest(32, compression);
         }
+
+        // First values are very cheap to add, we are more interested in the steady state,
+        // when the summary is full. Summaries are expected to contain about 5*compression
+        // centroids, hence the 5 factor
+        for (int i = 0; i < 5 * compression; ++i) {
+            td.add(gen.nextDouble());
+        }
     }
 
     @State(Scope.Thread)
