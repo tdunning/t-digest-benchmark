@@ -14,7 +14,7 @@
 # limitations under the License.
 
 pdf("results.pdf", width=5, height=4, pointsize=11)
-xx = read.csv("/Users/tdunning/Apache/t-digest-benchmark/results.csv")
+xx = read.csv("results.csv")
 plot(Mean ~ Param..compression, xx[xx$Param..method == "array",], type='b',
     ylim=c(0,800), xlab="Compression Factor", ylab="Time (ns)", pch=21)
 lines(Mean ~ Param..compression, xx[xx$Param..method == "tree",], type='b', pch=24)

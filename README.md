@@ -8,7 +8,7 @@ How to Run
 
 Compile the code
 
-    mvn clean install
+    mvn clean package
 
 and run the benchmarks
 
@@ -18,4 +18,4 @@ Then run the visualization
 
     Rscript plot-data.r
 
-Look at plot.pdf for the results.
+Look at results.pdf for the results.
