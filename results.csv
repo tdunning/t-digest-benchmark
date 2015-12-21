@@ -1,11 +1,16 @@
-"Benchmark","Mode","Threads","Samples","Mean","Mean Error (99.9%)","Unit","Param: compression","Param: method"
-"com.tdunning.Benchmark.add","avgt",1,5,195.8314912281892,24.573308129351563,"ns/op","20","tree"
-"com.tdunning.Benchmark.add","avgt",1,5,226.76357165720555,48.580021082941755,"ns/op","20","array"
-"com.tdunning.Benchmark.add","avgt",1,5,245.65684630683936,14.568877401780993,"ns/op","50","tree"
-"com.tdunning.Benchmark.add","avgt",1,5,281.5178033056228,6.194700764244074,"ns/op","50","array"
-"com.tdunning.Benchmark.add","avgt",1,5,280.03898615857383,10.46549809327377,"ns/op","100","tree"
-"com.tdunning.Benchmark.add","avgt",1,5,325.18526235633107,40.999749094249196,"ns/op","100","array"
-"com.tdunning.Benchmark.add","avgt",1,5,293.40165586362536,13.908231553322576,"ns/op","200","tree"
-"com.tdunning.Benchmark.add","avgt",1,5,419.54929070575855,48.82007172818868,"ns/op","200","array"
-"com.tdunning.Benchmark.add","avgt",1,5,343.9850681833609,5.179658421913621,"ns/op","500","tree"
-"com.tdunning.Benchmark.add","avgt",1,5,662.8884130967375,28.870360750525634,"ns/op","500","array"
+Benchmark,Param: compression,Param: method,Mode,Samples,Mean,Mean error,Units
+c.t.Benchmark.add,20,merge,avgt,5,820.440,247.563,ns/op
+c.t.Benchmark.add,20,tree,avgt,5,200.481,30.410,ns/op
+c.t.Benchmark.add,20,array,avgt,5,259.489,35.038,ns/op
+c.t.Benchmark.add,50,merge,avgt,5,831.524,245.094,ns/op
+c.t.Benchmark.add,50,tree,avgt,5,236.275,67.906,ns/op
+c.t.Benchmark.add,50,array,avgt,5,304.340,31.086,ns/op
+c.t.Benchmark.add,100,merge,avgt,5,818.895,245.415,ns/op
+c.t.Benchmark.add,100,tree,avgt,5,270.897,17.520,ns/op
+c.t.Benchmark.add,100,array,avgt,5,382.054,136.125,ns/op
+c.t.Benchmark.add,200,merge,avgt,5,818.196,242.686,ns/op
+c.t.Benchmark.add,200,tree,avgt,5,297.104,22.854,ns/op
+c.t.Benchmark.add,200,array,avgt,5,430.213,43.975,ns/op
+c.t.Benchmark.add,500,merge,avgt,5,818.100,243.571,ns/op
+c.t.Benchmark.add,500,tree,avgt,5,336.277,41.053,ns/op
+c.t.Benchmark.add,500,array,avgt,5,620.699,63.798,ns/op

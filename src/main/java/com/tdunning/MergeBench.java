@@ -17,8 +17,6 @@
 
 package com.tdunning;
 
-import com.tdunning.math.stats.AVLTreeDigest;
-import com.tdunning.math.stats.ArrayDigest;
 import com.tdunning.math.stats.MergingDigest;
 import com.tdunning.math.stats.TDigest;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -43,6 +41,12 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Explores the value of using a large buffer for the MergingDigest. The rationale is that the internal
+ * sort is extremely fast while the merging function in the t-digest can be quite slow, if only because
+ * computing the asin function involved in the merge is expensive. This argues for collecting more samples
+ * before sorting and merging them into the digest.
+ */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 3, time = 3, timeUnit = TimeUnit.SECONDS)
@@ -50,15 +54,15 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Threads(1)
 @State(Scope.Thread)
-public class Benchmark {
+public class MergeBench {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"merge", "tree", "array"})
-    public String method;
-
-    @Param({"20", "50", "100", "200", "500"})
+    @Param({"100", "200", "500", "1000"})
     public int compression;
+
+    @Param({"10", "20", "1", "2", "5", "100"})
+    public int factor;
 
     private TDigest td;
 
@@ -68,13 +72,9 @@ public class Benchmark {
         for (int i = 0; i < data.length; i++) {
             data[i] = gen.nextDouble();
         }
-        if (method.equals("tree")) {
-            td = new AVLTreeDigest(compression);
-        } else if (method.equals("array")){
-            td = new ArrayDigest(64, compression);
-        } else {
-            td = new MergingDigest(500);
-        }
+        int tempSize = (int) (7.5 + 0.37 * compression - 2e-4 * compression * compression);
+        int bufferSize = (int) (Math.PI * compression + 0.5);
+        td = new MergingDigest(compression, factor * tempSize, bufferSize);
 
         // First values are very cheap to add, we are more interested in the steady state,
         // when the summary is full. Summaries are expected to contain about 5*compression
@@ -99,9 +99,9 @@ public class Benchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(".*" + Benchmark.class.getSimpleName() + ".*")
+                .include(".*" + MergeBench.class.getSimpleName() + ".*")
                 .resultFormat(ResultFormatType.CSV)
-                .result("results.csv")
+                .result("merge-results.csv")
                 .addProfiler(ProfilerType.HS_GC)
                 .addProfiler(ProfilerType.STACK)
                 .build();
