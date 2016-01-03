@@ -50,15 +50,21 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Threads(1)
 @State(Scope.Thread)
-public class Benchmark {
+public class MergeBench {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"tree", "array"})
-    public String method;
-
-    @Param({"20", "50", "100", "200", "500"})
+    @Param({"100", "200", "500", "1000"})
     public int compression;
+
+    @Param({"1", "10", "100"})
+    public int factor;
+
+//    @Param({"400"})
+//    public int arraySize;
+//
+//    @Param({"315", "629", "1571"})
+//    public int tempSize;
 
     private TDigest td;
 
@@ -68,13 +74,9 @@ public class Benchmark {
         for (int i = 0; i < data.length; i++) {
             data[i] = gen.nextDouble();
         }
-        if (method.equals("tree")) {
-            td = new AVLTreeDigest(compression);
-        } else if (method.equals("array")){
-            td = new ArrayDigest(64, compression);
-        } else {
-            td = new MergingDigest(500);
-        }
+        int tempSize = (int) (7.5 + 0.37 * compression - 2e-4 * compression * compression);
+        int bufferSize = (int) (Math.PI * compression + 0.5);
+        td = new MergingDigest(compression, factor * tempSize, bufferSize);
 
         // First values are very cheap to add, we are more interested in the steady state,
         // when the summary is full. Summaries are expected to contain about 5*compression
@@ -99,11 +101,11 @@ public class Benchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(".*" + Benchmark.class.getSimpleName() + ".*")
+                .include(".*" + MergeBench.class.getSimpleName() + ".*")
                 .resultFormat(ResultFormatType.CSV)
                 .result("results.csv")
                 .addProfiler(ProfilerType.HS_GC)
-                .addProfiler(ProfilerType.STACK)
+//                .addProfiler(ProfilerType.STACK)
                 .build();
 
         new Runner(opt).run();

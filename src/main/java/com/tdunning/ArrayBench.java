@@ -19,7 +19,6 @@ package com.tdunning;
 
 import com.tdunning.math.stats.AVLTreeDigest;
 import com.tdunning.math.stats.ArrayDigest;
-import com.tdunning.math.stats.MergingDigest;
 import com.tdunning.math.stats.TDigest;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
@@ -43,22 +42,25 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Created by tdunning on 5/15/14.
+ */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Warmup(iterations = 3, time = 3, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 5, time = 2, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 4, time = 3, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 8, time = 2, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @Threads(1)
 @State(Scope.Thread)
-public class Benchmark {
+public class ArrayBench {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"tree", "array"})
-    public String method;
-
     @Param({"20", "50", "100", "200", "500"})
     public int compression;
+
+    @Param({"8", "16", "24", "32", "48", "64"})
+    public int pageSize;
 
     private TDigest td;
 
@@ -68,13 +70,7 @@ public class Benchmark {
         for (int i = 0; i < data.length; i++) {
             data[i] = gen.nextDouble();
         }
-        if (method.equals("tree")) {
-            td = new AVLTreeDigest(compression);
-        } else if (method.equals("array")){
-            td = new ArrayDigest(64, compression);
-        } else {
-            td = new MergingDigest(500);
-        }
+        td = new ArrayDigest(pageSize, compression);
 
         // First values are very cheap to add, we are more interested in the steady state,
         // when the summary is full. Summaries are expected to contain about 5*compression
@@ -101,12 +97,11 @@ public class Benchmark {
         Options opt = new OptionsBuilder()
                 .include(".*" + Benchmark.class.getSimpleName() + ".*")
                 .resultFormat(ResultFormatType.CSV)
-                .result("results.csv")
+                .result("results-array-tuning.csv")
                 .addProfiler(ProfilerType.HS_GC)
                 .addProfiler(ProfilerType.STACK)
                 .build();
 
         new Runner(opt).run();
     }
-
 }
