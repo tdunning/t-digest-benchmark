@@ -49,3 +49,16 @@ for (compression in compressions) {
 
 legend(x=30, y=5400, legend=compressions, pch=20 + (1:length(compressions)), title="Compression")
 dev.off()
+
+pdf("results-array-tuning.pdf", width=5, height=4, pointsize=11)
+yy = read.delim("results-array-tuning.csv")
+plot(x=c(),y=c(), xlim=c(0,72), ylim=c(0,1000), ylab="Time (ns)", xlab="Pagesize", xaxt='n')
+
+axis(side=1, at=as.integer(names(table(yy$pageSize))))
+i = 1
+for (compression in c(20,50,100,200,500)) {
+    lines(Mean ~ pageSize, yy[yy$compression == compression,], type='b', pch = 20+i)
+    i = i+1
+}
+legend(40,1000, pch=c(21:25), legend=paste("compression =", c(20,50,100,200,500)))
+dev.off()

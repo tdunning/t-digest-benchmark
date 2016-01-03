@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Benchmark,Param: compression,Param: method,Mode,Samples,Mean,Mean error,Units
 c.t.Benchmark.add,20,merge,avgt,5,820.440,247.563,ns/op
 c.t.Benchmark.add,20,tree,avgt,5,200.481,30.410,ns/op
@@ -14,3 +15,18 @@ c.t.Benchmark.add,200,array,avgt,5,430.213,43.975,ns/op
 c.t.Benchmark.add,500,merge,avgt,5,818.100,243.571,ns/op
 c.t.Benchmark.add,500,tree,avgt,5,336.277,41.053,ns/op
 c.t.Benchmark.add,500,array,avgt,5,620.699,63.798,ns/op
+=======
+"Benchmark","Mode","Threads","Samples","Mean","Mean Error (99.9%)","Unit","Param: compression","Param: factor"
+"com.tdunning.MergeBench.add","avgt",1,5,2747.204853886403,71.50631083393398,"ns/op","100","1"
+"com.tdunning.MergeBench.add","avgt",1,5,625.7462737692824,14.814125887947323,"ns/op","100","10"
+"com.tdunning.MergeBench.add","avgt",1,5,416.1508240652264,14.513939826366105,"ns/op","100","100"
+"com.tdunning.MergeBench.add","avgt",1,5,3137.046502077589,97.13511481488565,"ns/op","200","1"
+"com.tdunning.MergeBench.add","avgt",1,5,659.0082219505264,33.87632376579628,"ns/op","200","10"
+"com.tdunning.MergeBench.add","avgt",1,5,422.5339686737478,8.808348009373518,"ns/op","200","100"
+"com.tdunning.MergeBench.add","avgt",1,5,3843.7714479619317,137.52960759914825,"ns/op","500","1"
+"com.tdunning.MergeBench.add","avgt",1,5,749.0316722070108,27.950769031594792,"ns/op","500","10"
+"com.tdunning.MergeBench.add","avgt",1,5,442.52187842457454,14.166797412124636,"ns/op","500","100"
+"com.tdunning.MergeBench.add","avgt",1,5,5875.644809842485,218.99738031211353,"ns/op","1000","1"
+"com.tdunning.MergeBench.add","avgt",1,5,953.0745260840188,19.278263750459065,"ns/op","1000","10"
+"com.tdunning.MergeBench.add","avgt",1,5,474.29352830850905,17.504645650576414,"ns/op","1000","100"
+>>>>>>> 4d3b19f7094053ebbc2c62611a69b75e67e10a36

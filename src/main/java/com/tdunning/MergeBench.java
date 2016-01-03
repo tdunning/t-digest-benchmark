@@ -61,7 +61,7 @@ public class MergeBench {
     @Param({"100", "200", "500", "1000"})
     public int compression;
 
-    @Param({"10", "20", "1", "2", "5", "100"})
+    @Param({"1", "2", "5", "100", "10", "20"})
     public int factor;
 
     private TDigest td;
