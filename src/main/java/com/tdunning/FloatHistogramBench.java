@@ -17,21 +17,9 @@
 
 package com.tdunning;
 
-import com.tdunning.math.stats.AVLTreeDigest;
-import com.tdunning.math.stats.ArrayDigest;
-import com.tdunning.math.stats.MergingDigest;
-import com.tdunning.math.stats.TDigest;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
+import com.tdunning.math.stats.FloatHistogram;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -43,6 +31,12 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Explores the value of using a large buffer for the MergingDigest. The rationale is that the internal
+ * sort is extremely fast while the merging function in the t-digest can be quite slow, if only because
+ * computing the asin function involved in the merge is expensive. This argues for collecting more samples
+ * before sorting and merging them into the digest.
+ */
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 3, time = 3, timeUnit = TimeUnit.SECONDS)
@@ -50,17 +44,14 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Threads(1)
 @State(Scope.Thread)
-public class Benchmark {
+public class FloatHistogramBench {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"merge", "tree", "array"})
-    public String method;
+    @Param({"20", "50", "100"})
+    public int binsPerDecade;
 
-    @Param({"20", "50", "100", "200", "500"})
-    public int compression;
-
-    private TDigest td;
+    private FloatHistogram fh;
 
     @Setup
     public void setup() {
@@ -68,19 +59,10 @@ public class Benchmark {
         for (int i = 0; i < data.length; i++) {
             data[i] = gen.nextDouble();
         }
-        if (method.equals("tree")) {
-            td = new AVLTreeDigest(compression);
-        } else if (method.equals("array")){
-            td = new ArrayDigest(64, compression);
-        } else {
-            td = new MergingDigest(500);
-        }
+        fh = new FloatHistogram(0.1, 10000, binsPerDecade);
 
-        // First values are very cheap to add, we are more interested in the steady state,
-        // when the summary is full. Summaries are expected to contain about 5*compression
-        // centroids, hence the 5 factor
-        for (int i = 0; i < 5 * compression; ++i) {
-            td.add(gen.nextDouble());
+        for (int i = 0; i < 10000; ++i) {
+            fh.add(gen.nextDouble());
         }
     }
 
@@ -89,21 +71,21 @@ public class Benchmark {
         int index = 0;
     }
 
-    @org.openjdk.jmh.annotations.Benchmark
+    @Benchmark
     public void add(ThreadState state) {
         if (state.index >= data.length) {
             state.index = 0;
         }
-        td.add(data[state.index++]);
+        fh.add(data[state.index++]);
     }
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(".*" + Benchmark.class.getSimpleName() + ".*")
+                .include(".*" + FloatHistogramBench.class.getSimpleName() + ".*")
                 .resultFormat(ResultFormatType.CSV)
-                .result("results.csv")
-                .addProfiler(GCProfiler.class)
+                .result("overall-results.csv")
                 .addProfiler(StackProfiler.class)
+                .addProfiler(GCProfiler.class)
                 .build();
 
         new Runner(opt).run();

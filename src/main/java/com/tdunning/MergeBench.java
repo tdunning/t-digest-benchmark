@@ -19,20 +19,10 @@ package com.tdunning;
 
 import com.tdunning.math.stats.MergingDigest;
 import com.tdunning.math.stats.TDigest;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.output.results.ResultFormatType;
-import org.openjdk.jmh.profile.ProfilerType;
+
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -58,10 +48,10 @@ public class MergeBench {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"100", "200", "500", "1000"})
+    @Param({"50", "100", "200", "500"})
     public int compression;
 
-    @Param({"1", "2", "5", "100", "10", "20"})
+    @Param({"2", "5", "10", "20"})
     public int factor;
 
     private TDigest td;
@@ -72,9 +62,7 @@ public class MergeBench {
         for (int i = 0; i < data.length; i++) {
             data[i] = gen.nextDouble();
         }
-        int tempSize = (int) (7.5 + 0.37 * compression - 2e-4 * compression * compression);
-        int bufferSize = (int) (Math.PI * compression + 0.5);
-        td = new MergingDigest(compression, factor * tempSize, bufferSize);
+        td = new MergingDigest(compression, (factor + 1) * compression, 2 * compression);
 
         // First values are very cheap to add, we are more interested in the steady state,
         // when the summary is full. Summaries are expected to contain about 5*compression
@@ -89,7 +77,9 @@ public class MergeBench {
         int index = 0;
     }
 
-    @GenerateMicroBenchmark
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @OutputTimeUnit(TimeUnit.MICROSECONDS)
     public void add(ThreadState state) {
         if (state.index >= data.length) {
             state.index = 0;
@@ -99,11 +89,11 @@ public class MergeBench {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(".*" + MergeBench.class.getSimpleName() + ".*")
+                .include(MergeBench.class.getSimpleName())
+                .warmupIterations(5)
+                .measurementIterations(5)
+                .forks(1)
                 .resultFormat(ResultFormatType.CSV)
-                .result("merge-results.csv")
-                .addProfiler(ProfilerType.HS_GC)
-                .addProfiler(ProfilerType.STACK)
                 .build();
 
         new Runner(opt).run();

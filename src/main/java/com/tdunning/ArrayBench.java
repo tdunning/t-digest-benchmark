@@ -19,20 +19,10 @@ package com.tdunning;
 
 import com.tdunning.math.stats.ArrayDigest;
 import com.tdunning.math.stats.TDigest;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.GenerateMicroBenchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
-import org.openjdk.jmh.output.results.ResultFormatType;
-import org.openjdk.jmh.profile.ProfilerType;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.profile.GCProfiler;
+import org.openjdk.jmh.profile.StackProfiler;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -43,8 +33,8 @@ import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Warmup(iterations = 4, time = 3, timeUnit = TimeUnit.SECONDS)
-@Measurement(iterations = 8, time = 2, timeUnit = TimeUnit.SECONDS)
+@Warmup(iterations = 3, time = 3, timeUnit = TimeUnit.SECONDS)
+@Measurement(iterations = 5, time = 2, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 @Threads(1)
 @State(Scope.Thread)
@@ -81,7 +71,7 @@ public class ArrayBench {
         int index = 0;
     }
 
-    @GenerateMicroBenchmark
+    @org.openjdk.jmh.annotations.Benchmark
     public void add(ThreadState state) {
         if (state.index >= data.length) {
             state.index = 0;
@@ -94,8 +84,8 @@ public class ArrayBench {
                 .include(".*" + Benchmark.class.getSimpleName() + ".*")
                 .resultFormat(ResultFormatType.CSV)
                 .result("results-array-tuning.csv")
-                .addProfiler(ProfilerType.HS_GC)
-                .addProfiler(ProfilerType.STACK)
+                .addProfiler(GCProfiler.class)
+                .addProfiler(StackProfiler.class)
                 .build();
 
         new Runner(opt).run();
