@@ -18,20 +18,9 @@
 package com.tdunning;
 
 import com.tdunning.math.stats.AVLTreeDigest;
-import com.tdunning.math.stats.ArrayDigest;
 import com.tdunning.math.stats.MergingDigest;
 import com.tdunning.math.stats.TDigest;
-import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Mode;
-import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.annotations.Param;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Threads;
-import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.profile.GCProfiler;
 import org.openjdk.jmh.profile.StackProfiler;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -54,7 +43,7 @@ public class Benchmark {
     private Random gen = new Random();
     private double[] data;
 
-    @Param({"merge", "tree", "array"})
+    @Param({"merge", "tree"})
     public String method;
 
     @Param({"20", "50", "100", "200", "500"})
@@ -70,8 +59,6 @@ public class Benchmark {
         }
         if (method.equals("tree")) {
             td = new AVLTreeDigest(compression);
-        } else if (method.equals("array")){
-            td = new ArrayDigest(64, compression);
         } else {
             td = new MergingDigest(500);
         }

@@ -13,7 +13,6 @@ Compile the code
 and run the benchmarks
 
     java -jar target/microbenchmarks.jar com.tdunning.Benchmark.add -rff results.csv
-    java -jar target/microbenchmarks.jar com.tdunning.ArrayBench.add -rff results-array-tuning.csv
     java -cp target/microbenchmarks.jar com.tdunning.MergeBench 
 
 Then run the visualization

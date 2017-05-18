@@ -51,7 +51,7 @@ public class MergeBench {
     @Param({"50", "100", "200", "500"})
     public int compression;
 
-    @Param({"2", "5", "10", "20"})
+    @Param({"1", "2", "5", "10"})
     public int factor;
 
     private TDigest td;
@@ -65,7 +65,7 @@ public class MergeBench {
         td = new MergingDigest(compression, (factor + 1) * compression, 2 * compression);
 
         // First values are very cheap to add, we are more interested in the steady state,
-        // when the summary is full. Summaries are expected to contain about 5*compression
+        // when the summary is full. Summaries are expected to contain about 2*compression
         // centroids, hence the 5 factor
         for (int i = 0; i < 5 * compression; ++i) {
             td.add(gen.nextDouble());
